@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Support\TenantContext;
 use Illuminate\Database\Seeder;
+use RuntimeException;
 
 class SuperAdminSeeder extends Seeder
 {
@@ -12,13 +13,21 @@ class SuperAdminSeeder extends Seeder
     {
         TenantContext::clear();
 
-        $email = mb_strtolower((string) env('SUPER_ADMIN_EMAIL', 'superadmin@absensi.com'));
-        $password = (string) env('SUPER_ADMIN_PASSWORD', 'superadmin123');
+        $email = mb_strtolower((string) config('absensi.super_admin.email'));
+        $password = (string) config('absensi.super_admin.password');
+
+        if ($password === '') {
+            if (app()->environment('production')) {
+                throw new RuntimeException('SUPER_ADMIN_PASSWORD wajib diisi di .env sebelum menjalankan seeder produksi.');
+            }
+
+            $password = 'superadmin123';
+        }
 
         User::query()->updateOrCreate(
             ['email' => $email],
             [
-                'name' => (string) env('SUPER_ADMIN_NAME', 'Super Admin'),
+                'name' => (string) config('absensi.super_admin.name'),
                 'password' => $password,
                 'role' => User::ROLE_SUPER_ADMIN,
                 'tenant_id' => null,

@@ -41,20 +41,25 @@ DB_PASSWORD=
 
 Lalu jalankan ulang `php artisan migrate --seed`.
 
-## Akun Demo
+## Akun Admin Awal
 
-| Peran | Email | Password |
-|---|---|---|
-| Admin | admin@absensi.com | admin123 |
-| Atasan | dewi@absensi.com | 123456 |
-| Karyawan | aditya@absensi.com | 123456 |
-| Karyawan | budi@absensi.com | 123456 |
-| Karyawan | citra@absensi.com | 123456 |
-| Karyawan | dimas@absensi.com | 123456 |
-| Karyawan | eko@absensi.com | 123456 |
-| Karyawan | fajar@absensi.com | 123456 |
-| Karyawan | rina@absensi.com | 123456 |
-| Karyawan | nanda@absensi.com | 123456 |
+Seeder produksi hanya membuat **satu akun admin** (dan akun super admin
+platform). Tidak ada akun karyawan/supervisor demo — data karyawan diisi
+manual melalui menu Pengguna setelah login sebagai admin.
+
+Atur kredensial di `.env` sebelum menjalankan `php artisan migrate --seed`:
+
+```env
+ADMIN_NAME="Administrator"
+ADMIN_EMAIL=admin@absensi.com
+ADMIN_PASSWORD=ubah-password-ini
+TENANT_NAME="Absensi"
+TENANT_CODE=absensi
+```
+
+Saat `APP_ENV=production`, `ADMIN_PASSWORD` dan `SUPER_ADMIN_PASSWORD` wajib
+diisi. Super admin platform memakai `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`,
+dan `SUPER_ADMIN_NAME`.
 
 Peran yang dikenal: `admin`, `supervisor`, `employee`. Admin dan supervisor
 dianggap sebagai atasan (boleh meninjau pengajuan dan mengelola data).
