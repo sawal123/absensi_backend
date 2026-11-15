@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         $this->ensureManager($request);
 
-        $query = User::query();
+        $query = User::query()->with(['officeLocation', 'tenant']);
 
         if ($role = $request->query('role')) {
             $query->where('role', $role);
@@ -63,14 +63,14 @@ class UserController extends Controller
 
         $user = User::query()->create($data);
 
-        return (new UserResource($user))->response()->setStatusCode(201);
+        return (new UserResource($user->load(['officeLocation', 'tenant'])))->response()->setStatusCode(201);
     }
 
     public function show(Request $request, User $user): UserResource
     {
         $this->ensureSelfOrManager($request, $user->id);
 
-        return new UserResource($user);
+        return new UserResource($user->load(['officeLocation', 'tenant']));
     }
 
     public function update(UpdateUserRequest $request, User $user): UserResource
@@ -99,7 +99,7 @@ class UserController extends Controller
 
         $user->fill($data)->save();
 
-        return new UserResource($user->refresh());
+        return new UserResource($user->refresh()->load(['officeLocation', 'tenant']));
     }
 
     public function destroy(Request $request, User $user): JsonResponse
