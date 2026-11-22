@@ -58,7 +58,7 @@ final class DateHelper
     {
         [$hour, $minute] = array_pad(explode(':', $time), 2, '0');
 
-        return Carbon::parse($date)->setTime((int) $hour, (int) $minute);
+        return Carbon::parse($date)->setTime((int) $hour, (int) $minute, 0);
     }
 
     /**

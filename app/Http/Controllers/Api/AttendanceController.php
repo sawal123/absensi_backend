@@ -80,8 +80,10 @@ class AttendanceController extends Controller
     public function checkIn(CheckInRequest $request): JsonResponse
     {
         $user = $request->user();
-        $today = Carbon::today();
         $settings = OfficeSetting::current();
+        $tz = $settings->timezone ?: config('app.timezone', 'Asia/Jakarta');
+        $today = Carbon::today($tz);
+        $now = Carbon::now($tz);
         $location = $user->effectiveOfficeLocation();
 
         $attendance = Attendance::query()
@@ -118,12 +120,12 @@ class AttendanceController extends Controller
             ->first()?->shift;
 
         $scheduledStart = DateHelper::atTime(
-            Carbon::now(),
+            $now,
             $shift?->start_time ?? $settings->work_start,
         );
 
         $earliest = $scheduledStart->copy()->subMinutes($settings->early_check_in_minutes);
-        if (Carbon::now()->lt($earliest)) {
+        if ($now->lt($earliest)) {
             throw ValidationException::withMessages([
                 'check_in_at' => sprintf(
                     'Absen masuk baru dibuka pukul %s.',
@@ -133,7 +135,7 @@ class AttendanceController extends Controller
         }
 
         $lateThreshold = $scheduledStart->copy()->addMinutes($settings->late_tolerance_minutes);
-        $status = Carbon::now()->gt($lateThreshold) ? 'late' : 'present';
+        $status = $now->gt($lateThreshold) ? 'late' : 'present';
 
         $attendance ??= new Attendance([
             'user_id' => $user->id,
@@ -141,7 +143,7 @@ class AttendanceController extends Controller
         ]);
 
         $attendance->fill([
-            'check_in_at' => Carbon::now(),
+            'check_in_at' => $now,
             'check_in_lat' => $request->input('latitude'),
             'check_in_lng' => $request->input('longitude'),
             'check_in_photo' => $photo,
@@ -164,8 +166,10 @@ class AttendanceController extends Controller
     public function checkOut(CheckOutRequest $request): JsonResponse
     {
         $user = $request->user();
-        $today = Carbon::today();
         $settings = OfficeSetting::current();
+        $tz = $settings->timezone ?: config('app.timezone', 'Asia/Jakarta');
+        $today = Carbon::today($tz);
+        $now = Carbon::now($tz);
         $location = $user->effectiveOfficeLocation();
 
         $attendance = Attendance::query()
@@ -202,7 +206,7 @@ class AttendanceController extends Controller
         }
 
         $attendance->fill([
-            'check_out_at' => Carbon::now(),
+            'check_out_at' => $now,
             'check_out_lat' => $request->input('latitude'),
             'check_out_lng' => $request->input('longitude'),
             'check_out_photo' => $photo,

@@ -60,6 +60,9 @@ class UserController extends Controller
         $data['email'] = mb_strtolower($data['email']);
         $data['role'] = $data['role'] ?? User::ROLE_EMPLOYEE;
         $data['is_active'] = $data['is_active'] ?? true;
+        $data['position'] = (string) ($data['position'] ?? '');
+        $data['team'] = (string) ($data['team'] ?? '');
+        $data['nip'] = (string) ($data['nip'] ?? '');
 
         $user = User::query()->create($data);
 
@@ -93,8 +96,18 @@ class UserController extends Controller
             $data['email'] = mb_strtolower($data['email']);
         }
 
-        if (($data['password'] ?? null) === null) {
+        if (! $actor->isAdmin() || empty($data['password'])) {
             unset($data['password']);
+        }
+
+        if (array_key_exists('position', $data)) {
+            $data['position'] = (string) ($data['position'] ?? '');
+        }
+        if (array_key_exists('team', $data)) {
+            $data['team'] = (string) ($data['team'] ?? '');
+        }
+        if (array_key_exists('nip', $data)) {
+            $data['nip'] = (string) ($data['nip'] ?? '');
         }
 
         $user->fill($data)->save();

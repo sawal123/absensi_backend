@@ -63,6 +63,21 @@ class User extends Authenticatable
         ];
     }
 
+    public function setPositionAttribute($value): void
+    {
+        $this->attributes['position'] = (string) ($value ?? '');
+    }
+
+    public function setTeamAttribute($value): void
+    {
+        $this->attributes['team'] = (string) ($value ?? '');
+    }
+
+    public function setNipAttribute($value): void
+    {
+        $this->attributes['nip'] = (string) ($value ?? '');
+    }
+
     protected static function booted(): void
     {
         static::deleting(function (User $user) {
